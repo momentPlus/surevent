@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض يوم الطفل العالمي - تدشين</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            overflow: hidden;
+            user-select: none; /* لمنع تحديد النص أثناء الضغط */
+            -webkit-user-select: none;
+        }
+
+        /* حاوية الزر */
+        .hold-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* الدائرة الخلفية */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s linear;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* الزر نفسه */
+        .launch-btn {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e0e7ff);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 -5px 15px rgba(0,0,0,0.1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .launch-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* تأثير الاهتزاز أثناء الشحن */
+        .shaking {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0) scale(0.95); }
+            20%, 80% { transform: translate3d(2px, 0, 0) scale(0.95); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0) scale(0.95); }
+            40%, 60% { transform: translate3d(4px, 0, 0) scale(0.95); }
+        }
+
+        /* تأثير التوهج عند الاكتمال */
+        .glow-effect {
+            box-shadow: 0 0 50px 20px rgba(255, 255, 255, 0.8);
+            background: #fff;
+        }
+
+        /* انتقالات الصفحات */
+        .page {
+            transition: opacity 0.8s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hidden-page {
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .active-page {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* كانفاس الألعاب النارية */
+        #confettiCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen w-screen bg-cover bg-center" style="background-image: url('Gemini_Generated_Image_2l76wl2l76wl2l76.png');">
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- الصفحة الأولى: زر التدشين -->
+    <div id="landingPage" class="page active-page flex flex-col items-center justify-center">
+        <!-- طبقة تعتيم -->
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+
+        <div class="z-10 text-center flex flex-col items-center">
+            <h1 class="text-4xl md:text-6xl font-black mb-12 drop-shadow-2xl text-white tracking-wide">
+                يوم الطفل العالمي
+            </h1>
+            
+            <div class="hold-container">
+                <!-- حلقة التقدم -->
+                <svg class="absolute w-full h-full" viewBox="0 0 200 200">
+                    <circle class="text-gray-400 opacity-30" stroke-width="8" stroke="currentColor" fill="transparent" r="90" cx="100" cy="100" />
+                    <circle id="progressRing" class="progress-ring__circle text-blue-500" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="90" cx="100" cy="100" />
+                </svg>
+
+                <button id="launchBtn" class="launch-btn text-blue-900">
+                    <span class="text-xl font-bold">اضغط مطولاً</span>
+                    <span class="text-sm font-light mt-1">للتدشين</span>
+                </button>
+            </div>
+            
+            <p class="mt-8 text-lg text-gray-200 animate-pulse font-light">استمر بالضغط لبدء العرض</p>
+        </div>
+    </div>
+
+    <!-- الصفحة الثانية: الفيديو -->
+    <div id="videoPage" class="page hidden-page flex items-center justify-center bg-black">
+        <video id="mainVideo" class="max-w-full max-h-full shadow-2xl" playsinline>
+            <source src="النسخة النهائية.mp4" type="video/mp4">
+        </video>
+        <button onclick="resetApp()" class="absolute top-4 left-4 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 px-4 backdrop-blur-sm transition z-50">
+            خروج ✕
+        </button>
+    </div>
+
+    <script>
+        // --- إعدادات حلقة التقدم ---
+        const circle = document.getElementById('progressRing');
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+
+        function setProgress(percent) {
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        // --- متغيرات الحالة ---
+        const btn = document.getElementById('launchBtn');
+        const landingPage = document.getElementById('landingPage');
+        const videoPage = document.getElementById('videoPage');
+        const mainVideo = document.getElementById('mainVideo');
+        
+        let isHolding = false;
+        let holdStartTime = 0;
+        let holdDuration = 1500; // 2.5 ثانية للتدشين
+        let animationFrame;
+        let audioCtx;
+        let osc;
+        let gainNode;
+
+        // --- الصوت (Web Audio API) ---
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function startChargingSound() {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            osc = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
+            
+            osc.type = 'sawtooth'; // صوت أكثر حدة
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + (holdDuration/1000)); // تصاعد النغمة
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + (holdDuration/1000));
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+        }
+
+        function stopChargingSound() {
+            if (osc) {
+                const stopTime = audioCtx.currentTime + 0.1;
+                gainNode.gain.exponentialRampToValueAtTime(0.001, stopTime);
+                osc.stop(stopTime);
+                osc = null;
+            }
+        }
+
+        function playSuccessSound() {
+            if (!audioCtx) return;
+            const successOsc = audioCtx.createOscillator();
+            const successGain = audioCtx.createGain();
+            
+            successOsc.type = 'sine';
+            successOsc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            successOsc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+            
+            successGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            successGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+            
+            successOsc.connect(successGain);
+            successGain.connect(audioCtx.destination);
+            successOsc.start();
+            successOsc.stop(audioCtx.currentTime + 1.5);
+        }
+
+        // --- منطق الضغط ---
+        function startHold(e) {
+            e.preventDefault(); // منع قائمة السياق على الموبايل
+            if (isHolding) return;
+            
+            isHolding = true;
+            holdStartTime = Date.now();
+            btn.classList.add('shaking');
+            startChargingSound();
+            
+            requestAnimationFrame(updateHold);
+        }
+
+        function endHold() {
+            if (!isHolding) return;
+            isHolding = false;
+            btn.classList.remove('shaking');
+            stopChargingSound();
+            
+            // إعادة تعيين التقدم ببطء أو بسرعة
+            circle.style.transition = 'stroke-dashoffset 0.3s ease-out';
+            circle.style.strokeDashoffset = circumference;
+        }
+
+        function updateHold() {
+            if (!isHolding) return;
+
+            const elapsed = Date.now() - holdStartTime;
+            const progress = Math.min((elapsed / holdDuration) * 100, 100);
+            
+            circle.style.transition = 'none'; // إزالة الانتقال لتحديث فوري
+            setProgress(progress);
+
+            if (progress >= 100) {
+                launch();
+            } else {
+                requestAnimationFrame(updateHold);
+            }
+        }
+
+        function launch() {
+            isHolding = false;
+            stopChargingSound();
+            playSuccessSound();
+            
+            btn.classList.remove('shaking');
+            btn.classList.add('glow-effect');
+            btn.innerHTML = '<span class="text-3xl">أنطلق</span>'; // تغيير الأيقونة
+            
+            // إطلاق الألعاب النارية
+            fireConfetti();
+            
+            // الانتقال للفيديو
+            setTimeout(() => {
+                landingPage.classList.remove('active-page');
+                landingPage.classList.add('hidden-page');
+                videoPage.classList.remove('hidden-page');
+                videoPage.classList.add('active-page');
+                
+                mainVideo.currentTime = 0;
+                mainVideo.play();
+                
+                // إعادة تعيين الزر للمرة القادمة
+                setTimeout(() => {
+                    btn.classList.remove('glow-effect');
+                    btn.innerHTML = '<span class="text-xl font-bold">اضغط مطولاً</span><span class="text-sm font-light mt-1">للتدشين</span>';
+                    setProgress(0);
+                }, 1000);
+            }, 1200); // انتظر قليلاً لرؤية الاحتفال
+        }
+
+        // --- مستمعات الأحداث (ماوس + لمس) ---
+        btn.addEventListener('mousedown', startHold);
+        btn.addEventListener('touchstart', startHold);
+
+        window.addEventListener('mouseup', endHold);
+        window.addEventListener('touchend', endHold);
+        
+        // --- نظام الألعاب النارية (Canvas Confetti بسيط) ---
+        function fireConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 150;
+            const colors = ['#ff0', '#f00', '#0f0', '#00f', '#0ff', '#f0f'];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    life: 100,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 5 + 2
+                });
+            }
+
+            function updateConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let activeParticles = false;
+
+                particles.forEach(p => {
+                    if (p.life > 0) {
+                        activeParticles = true;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.2; // Gravity
+                        p.life -= 1;
+                        
+                        ctx.fillStyle = p.color;
+                        ctx.globalAlpha = p.life / 100;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                if (activeParticles) {
+                    requestAnimationFrame(updateConfetti);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            updateConfetti();
+        }
+
+        // وظائف الفيديو
+        function resetApp() {
+            mainVideo.pause();
+            videoPage.classList.remove('active-page');
+            videoPage.classList.add('hidden-page');
+            landingPage.classList.remove('hidden-page');
+            landingPage.classList.add('active-page');
+            setProgress(0);
+        }
+
+        mainVideo.addEventListener('ended', resetApp);
+		 // دوال الدخول والخروج من الفل سكرين
+  function enterFullscreen() {
+    const el = document.documentElement; // أو غيّره لأي عنصر تريده
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) { // Safari
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) { // قديم
+      el.msRequestFullscreen();
+    }
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+
+  function isFullscreen() {
+    return document.fullscreenElement ||
+           document.webkitFullscreenElement ||
+           document.msFullscreenElement;
+  }
+
+  // عدّاد الكلكات
+  let clickCount = 0;
+  let firstClickTime = 0;
+  const CLICK_WINDOW = 800; // ms (الفترة القصوى بين أول وآخر كلك)
+
+  // غيّر target لو حاب يكون على عنصر معين بدال كل الصفحة
+  const target = document.documentElement; // أو document.getElementById('questionScreen') مثلاً
+
+  target.addEventListener('click', () => {
+    const now = Date.now();
+
+    // لو تعدّت المدة، نبدأ عد جديد
+    if (now - firstClickTime > CLICK_WINDOW) {
+      clickCount = 0;
+      firstClickTime = now;
+    }
+
+    clickCount++;
+
+    // لو أول كلك
+    if (clickCount === 1) {
+      firstClickTime = now;
+    }
+
+    // ٢ كلك → دخول فل سكرين (لو ما داخل فل سكرين)
+    if (!isFullscreen() && clickCount === 2) {
+      enterFullscreen();
+      // ما نرجع الصفر عشان نقدر نكمل لحد ٤ كلك إذا حاب يخرج بسرعة
+    }
+
+    // ٤ كلك → خروج من فل سكرين (لو داخل فل سكرين)
+    if (isFullscreen() && clickCount === 4) {
+      exitFullscreen();
+      clickCount = 0;
+      firstClickTime = 0;
+    }
+  });
+    </script>
+</body>
+</html>
