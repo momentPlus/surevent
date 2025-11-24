@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <title>أبطال عُمان - تحدي الأذكياء</title>
+  <style>
+    :root {
+      --bg-gradient-start: #E3F2FD;
+      --bg-gradient-end: #FFFFFF;
+      --primary-blue: #2962FF;
+      --dark-blue: #0D47A1;
+      --accent-cyan: #00B0FF;
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --text-main: #1A237E;
+      --text-secondary: #455A64;
+      --success-green: #00C853;
+      --error-red: #FF1744;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: "Tajawal", system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), #BBDEFB, var(--bg-gradient-end));
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .bg-shape {
+      position: absolute;
+      font-size: 150px;
+      opacity: 0.1;
+      color: var(--primary-blue);
+      pointer-events: none;
+      z-index: 0;
+      animation: floatShape 25s infinite linear;
+    }
+
+    @keyframes floatShape {
+      0% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-40px) rotate(15deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 40px;
+      border: 1px solid white;
+      box-shadow: 0 20px 50px rgba(13, 71, 161, 0.15),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      transition: height 0.3s ease;
+    }
+
+    .header {
+      padding: 40px 30px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .animate-text-gradient {
+      background: linear-gradient(to right, var(--primary-blue), var(--accent-cyan), var(--dark-blue), var(--primary-blue));
+      background-size: 200% auto;
+      color: #000;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textShine 3s linear infinite;
+    }
+
+    @keyframes textShine {
+      to { background-position: 200% center; }
+    }
+
+    .header h1 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .header p {
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .content {
+      padding: 30px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #nameScreen, #topicsScreen, #questionScreen, #endScreen {
+      animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.4s ease-in forwards !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+
+    .name-input-container {
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .hero-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 10px 15px rgba(41, 98, 255, 0.3));
+      animation: bounce 3s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .name-input-field {
+      width: 100%;
+      padding: 20px;
+      font-size: 24px;
+      border: 2px solid #E0E0E0;
+      border-radius: 50px;
+      text-align: center;
+      background: white;
+      color: var(--dark-blue);
+      margin-bottom: 30px;
+      transition: 0.3s;
+      font-family: inherit;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .name-input-field:focus {
+      background: #fff;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(41, 98, 255, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));
+      color: white;
+      border: none;
+      padding: 18px 50px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(41, 98, 255, 0.3);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+      margin: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(41, 98, 255, 0.4);
+    }
+
+    .btn:active { transform: scale(0.95); }
+
+    .btn.secondary {
+      background: white;
+      color: var(--text-secondary);
+      border: 1px solid #E0E0E0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .btn.secondary:hover {
+      background: #F5F5F5;
+      color: var(--dark-blue);
+    }
+
+    .btn.outline-blue {
+      background: white;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+      box-shadow: none;
+    }
+
+    .btn.outline-blue:hover {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    .btn-effect-1::after,
+    .btn-effect-2::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      border: 3px solid;
+      opacity: 0;
+      pointer-events: none;
+      animation: btnHalo 0.5s ease-out;
+    }
+
+    .btn-effect-1::after {
+      border-color: rgba(41, 98, 255, 0.8);
+    }
+
+    .btn-effect-2::after {
+      border-color: rgba(255, 152, 0, 0.9);
+    }
+
+    @keyframes btnHalo {
+      0% { opacity: 0.9; transform: scale(0.9); }
+      100% { opacity: 0; transform: scale(1.35); }
+    }
+
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+      perspective: 1000px;
+    }
+
+    .topic-btn {
+      background: white;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 30px;
+      padding: 30px 20px;
+      color: var(--dark-blue);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topic-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(180deg, rgba(41, 98, 255, 0), rgba(41, 98, 255, 0.05));
+      opacity: 0;
+      transition: 0.3s;
+    }
+
+    .topic-btn:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 20px 40px rgba(41, 98, 255, 0.15);
+      border-color: var(--accent-cyan);
+    }
+
+    .topic-btn:hover::before { opacity: 1; }
+
+    .topic-icon {
+      font-size: 50px;
+      background: #F5F7FA;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+
+    .topic-btn:hover .topic-icon {
+      background: var(--primary-blue);
+      color: white;
+      transform: scale(1.1) rotate(10deg);
+    }
+
+    .question-box {
+      background: white;
+      border-radius: 30px;
+      padding: 40px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .question-text {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.4;
+      color: var(--dark-blue);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #EFF3F8;
+      border-radius: 20px;
+      margin-top: 30px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00C853, #69F0AE);
+      width: 0%;
+      border-radius: 20px;
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .progress-fill.super-charged {
+      background: linear-gradient(90deg, #00C853, #00E676, #B9F6CA, #00C853);
+      background-size: 200% 100%;
+      animation: intensePulse 0.5s infinite linear;
+      box-shadow: 0 0 20px #00E676, 0 0 40px #00E676;
+    }
+
+    @keyframes intensePulse {
+      0% { background-position: 100% 0; filter: brightness(1); }
+      50% { filter: brightness(1.3); }
+      100% { background-position: -100% 0; filter: brightness(1); }
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .option-btn {
+      background: white;
+      border: 2px solid transparent;
+      border-radius: 25px;
+      padding: 25px;
+      color: var(--text-secondary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .option-btn:hover {
+      background: #F0F7FF;
+      transform: translateY(-3px);
+      border-color: var(--accent-cyan);
+      color: var(--primary-blue);
+    }
+
+    .option-btn.correct {
+      background: #E8F5E9;
+      border-color: var(--success-green);
+      color: #2E7D32;
+      box-shadow: 0 0 25px rgba(0, 200, 83, 0.3);
+    }
+
+    .option-btn.wrong {
+      background: #FFEBEE;
+      border-color: var(--error-red);
+      color: #C62828;
+      opacity: 0.8;
+    }
+
+    .message-box {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.3rem;
+      animation: fadeIn 0.3s;
+    }
+
+    .message-box.success { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .message-box.try-again { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+
+    .sound-toggle {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      background: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 100;
+      font-size: 1.2rem;
+      color: var(--primary-blue);
+      transition: 0.3s;
+    }
+
+    .sound-toggle:hover { transform: scale(1.1); }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 2.5rem; }
+      .options-grid { grid-template-columns: 1fr; }
+      .container { min-height: 100vh; border-radius: 0; border: none; background: transparent; box-shadow: none;}
+      .glass-bg-mobile {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid white;
+      }
+      .content { padding: 15px; }
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+</head>
+<body>
+  <div class="bg-shape" style="top: 10%; right: 5%;">⭐</div>
+  <div class="bg-shape" style="bottom: 15%; left: 10%; animation-delay: -5s;">☁️</div>
+  <div class="bg-shape" style="top: 40%; left: 50%; font-size: 80px; animation-delay: -10s;">✨</div>
+
+  <div class="container glass-bg-mobile">
+    <div class="sound-toggle" onclick="toggleMute()" id="soundBtn">🔊</div>
+
+    <div class="header">
+      <h1 class="animate-text-gradient">أبطال عُمان</h1>
+      <p>تحدي الأذكياء</p>
+    </div>
+
+    <div class="content">
+      <!-- الشاشة 1: الاسم -->
+      <div id="nameScreen">
+        <div class="name-input-container">
+          <div class="hero-icon">🦸🦸‍♂️</div>
+          <h2 style="margin-bottom: 25px; color: var(--dark-blue);" class="animate-text-gradient">
+            أهلاً بك أيها البطل!
+          </h2>
+          <input type="text" id="childName" class="name-input-field" placeholder="اكتب اسمك هنا..." maxlength="20">
+          <button class="btn" onclick="startGame()">انطلاق المغامرة 🚀</button>
+        </div>
+      </div>
+
+      <!-- الشاشة 2: المواضيع -->
+      <div id="topicsScreen" style="display: none;">
+        <h3 class="animate-text-gradient" style="text-align: center; margin-bottom: 30px; font-size: 2rem;">
+          اختر ميدان التحدي
+        </h3>
+        <div class="topics-grid">
+          <button class="topic-btn" onclick="startTopic('education')">
+            <div class="topic-icon">📚</div>
+            <div style="font-size: 20px; font-weight: 800;">التعليم</div>
+          </button>
+          <button class="topic-btn" onclick="startTopic('health')">
+            <div class="topic-icon">🏥</div>
+            <div style="font-size: 20px; font-weight: 800;">الصحة</div>
+          </button>
+          <button class="topic-btn" onclick="startTopic('play')">
+            <div class="topic-icon">⚽</div>
+            <div style="font-size: 20px; font-weight: 800;">اللعب</div>
+          </button>
+          <button class="topic-btn" onclick="startTopic('safety')">
+            <div class="topic-icon">🛡️</div>
+            <div style="font-size: 20px; font-weight: 800;">الأمان</div>
+          </button>
+          <button class="topic-btn" onclick="startTopic('environment')">
+            <div class="topic-icon">🌍</div>
+            <div style="font-size: 20px; font-weight: 800;">البيئة</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- الشاشة 3: الأسئلة -->
+      <div id="questionScreen" style="display: none;">
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px;">
+          <button class="btn secondary" style="padding: 8px 20px; font-size: 1rem; border-radius: 50px;" onclick="backToTopics()">
+            خروج 🏠
+          </button>
+        </div>
+
+        <div id="questionContainer">
+          <div class="question-box">
+            <div class="question-text" id="questionText"></div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="options-grid" id="optionsGrid"></div>
+          <div class="message-box" id="messageBox" style="display: none;"></div>
+        </div>
+      </div>
+
+      <!-- الشاشة 4: النهاية -->
+      <div id="endScreen" style="display: none; text-align: center;">
+        <div style="font-size: 100px; margin-bottom: 20px; animation: bounce 2s infinite;">🏆</div>
+        <h2 id="endTitleText" class="animate-text-gradient" style="font-size: 3rem; margin-bottom: 20px;"></h2>
+        <div class="message-box" style="background: white; border: none; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); color: var(--text-secondary);">
+          لقد أتممت المهمة بنجاح! <br> أنت بطل حقيقي في حقوق الطفل
+        </div>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+          <button class="btn" id="newAdventureBtn" onclick="backToTopics()">مغامرة جديدة 🎯</button>
+          <button class="btn outline-blue" id="newPlayerBtn" onclick="resetToNewPlayer()">شخص جديد 👤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/_sdk/element_sdk.js"></script>
+  <script>
+    // Web Audio API للأصوات القصيرة (ضغط، صح، خطأ، فوز...)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = AudioCtx ? new AudioCtx() : null;
+    let isMuted = false;
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('soundBtn');
+      btn.textContent = isMuted ? '🔇' : '🔊';
+
+      // إذا تم كتم الصوت، أوقف صوت السؤال أيضاً
+      try {
+        questionVoice.pause();
+      } catch (e) {}
+    }
+
+    function playSound(type) {
+      if (isMuted || !audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.1);
+        osc.frequency.setValueAtTime(659.25, now + 0.2);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'win') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.15);
+        osc.frequency.setValueAtTime(783.99, now + 0.30);
+        osc.frequency.setValueAtTime(987.77, now + 0.45);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+        osc.start(now);
+        osc.stop(now + 0.9);
+      } else if (type === 'newAdventure') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(392.00, now);
+        osc.frequency.setValueAtTime(523.25, now + 0.08);
+        osc.frequency.setValueAtTime(659.25, now + 0.16);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } else if (type === 'newPlayer') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, now);
+        osc.frequency.setValueAtTime(440.00, now + 0.15);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+    }
+
+    // مشغّل صوت واحد لأسئلة الMp3
+    let questionVoice = new Audio();
+
+    function playQuestionSound(fileName) {
+      if (isMuted) return;
+
+      try {
+        questionVoice.pause();
+        questionVoice.currentTime = 0;
+      } catch (e) {}
+
+      questionVoice = new Audio(fileName);
+      questionVoice.play().catch(() => {
+        // المتصفح ممكن يمنع التشغيل التلقائي، نتجاهل الخطأ
+      });
+    }
+
+    const TOPICS = { 
+      education: {
+        title: "التعليم", icon: "📚", color: "#6366f1",
+        questions: [
+          {
+            q: "أي سلوك صحيح داخل المدرسة؟",
+            sound: "1.mp3",
+            opts: [
+              { txt: "أصرخ في وجه المعلم", icon: "🗣️" },
+              { txt: "أحترم المعلم وأستمع", icon: "👂" },
+              { txt: "أكسر أدوات الصف", icon: "🔨" },
+              { txt: "أتنمر على زملائي", icon: "😠" }
+            ],
+            correct: 1
+          },
+          {
+            q: "ماذا تفعل إذا لم تفهم الدرس؟",
+            sound: "2.mp3",
+            opts: [
+              { txt: "أتجاهل الموضوع", icon: "🤷" },
+              { txt: "أسأل المعلم بأدب", icon: "🙋" },
+              { txt: "أشتت انتباه زملائي", icon: "🤡" },
+              { txt: "أنام في الحصة", icon: "😴" }
+            ],
+            correct: 1
+          },
+          {
+            q: "ما هو حقك في التعليم؟",
+            sound: "3.mp3",
+            opts: [
+              { txt: "الغياب متى شئت", icon: "🏃" },
+              { txt: "بيئة آمنة ومحترمة", icon: "🏫" },
+              { txt: "اللعب فقط", icon: "🎮" },
+              { txt: "عدم حل الواجبات", icon: "📝" }
+            ],
+            correct: 1
+          }
+        ]
+      },
+      health: {
+        title: "الصحة", icon: "🏥", color: "#ec4899",
+        questions: [
+          {
+            q: "ما هو الإفطار الصحي؟",
+            sound: "4.mp3",
+            opts: [
+              { txt: "مشروبات غازية", icon: "🥤" },
+              { txt: "خبز وبيض وماء", icon: "🥪" },
+              { txt: "شيبس وحلويات", icon: "🍬" },
+              { txt: "لا آكل شيئاً", icon: "🚫" }
+            ],
+            correct: 1
+          },
+          {
+            q: "كم كوب ماء نشرب يومياً؟",
+            sound: "5.mp3",
+            opts: [
+              { txt: "كوب واحد", icon: "🥛" },
+              { txt: "6-8 أكواب", icon: "🚰" },
+              { txt: "لا أشرب ماء", icon: "🌵" },
+              { txt: "عند العطش فقط", icon: "🥵" }
+            ],
+            correct: 1
+          },
+          {
+            q: "متى نغسل اليدين؟",
+            sound: "6.mp3",
+            opts: [
+              { txt: "مرة أسبوعياً", icon: "🗓️" },
+              { txt: "قبل الأكل وبعده", icon: "🧼" },
+              { txt: "عند الاتساخ فقط", icon: "🖐️" },
+              { txt: "لا داعي", icon: "🦠" }
+            ],
+            correct: 1
+          }
+        ]
+      },
+      play: {
+        title: "اللعب", icon: "⚽", color: "#22c55e",
+        questions: [
+          {
+            q: "لماذا الرياضة مهمة؟",
+            sound: "7.mp3",
+            opts: [
+              { txt: "لإضاعة الوقت", icon: "⌛" },
+              { txt: "لصحة الجسم والعقل", icon: "💪" },
+              { txt: "ليست مهمة", icon: "👎" },
+              { txt: "للتعب فقط", icon: "😫" }
+            ],
+            correct: 1
+          },
+          {
+            q: "السلوك الصحيح في اللعب؟",
+            sound: "8.mp3",
+            opts: [
+              { txt: "أدفع الآخرين", icon: "🤜" },
+              { txt: "روح رياضية", icon: "🤝" },
+              { txt: "أغش في اللعب", icon: "🕵️" },
+              { txt: "أسخر من الخاسر", icon: "😝" }
+            ],
+            correct: 1
+          },
+          {
+            q: "كم ساعة يجب أن تلعب وتتحرك يومياً؟",
+            sound: "9.mp3",
+            opts: [
+              { txt: "لا حاجة للحركة", icon: "🛋️" },
+              { txt: "ساعة واحدة على الأقل", icon: "⏱️" },
+              { txt: "فقط 5 دقائق", icon: "⌚" },
+              { txt: "اللعب مضر دائماً", icon: "🙅‍♂️" }
+            ],
+            correct: 1
+          }
+        ]
+      },
+      safety: {
+        title: "الأمان", icon: "🛡️", color: "#f59e0b",
+        questions: [
+          {
+            q: "شعرت بالخطر، ماذا تفعل؟",
+            sound: "10.mp3",
+            opts: [
+              { txt: "أصمت", icon: "🤐" },
+              { txt: "أخبر شخصاً بالغاً", icon: "👨‍👩‍👧" },
+              { txt: "أتجاهل", icon: "🙈" },
+              { txt: "أواجه وحدي", icon: "⚔️" }
+            ],
+            correct: 1
+          },
+          {
+            q: "المكان الآمن للعب؟",
+            sound: "11.mp3",
+            opts: [
+              { txt: "الشارع", icon: "🚗" },
+              { txt: "الحديقة أو الملعب", icon: "🎡" },
+              { txt: "قرب السيارات", icon: "🚐" },
+              { txt: "مكان مظلم", icon: "🌑" }
+            ],
+            correct: 1
+          },
+          {
+            q: "من يحق له لمسك أو إزعاجك؟",
+            sound: "12.mp3",
+            opts: [
+              { txt: "أي شخص يريد ذلك", icon: "🚫" },
+              { txt: "لا أحد، جسمي ملكي وحدي", icon: "🧍" },
+              { txt: "كل الغرباء", icon: "⚠️" },
+              { txt: "أي شخص أكبر مني", icon: "❌" }
+            ],
+            correct: 1
+          }
+        ]
+      },
+      environment: {
+        title: "البيئة", icon: "🌍", color: "#06b6d4",
+        questions: [
+          {
+            q: "أين نرمي القمامة؟",
+            sound: "13.mp3",
+            opts: [
+              { txt: "الشارع", icon: "🛣️" },
+              { txt: "سلة المهملات", icon: "🗑️" },
+              { txt: "نحرقها", icon: "🔥" },
+              { txt: "الأرض", icon: "👇" }
+            ],
+            correct: 1
+          },
+          {
+            q: "فائدة الأشجار؟",
+            sound: "14.mp3",
+            opts: [
+              { txt: "لا فائدة", icon: "🪵" },
+              { txt: "هواء نظيف وظل", icon: "🌳" },
+              { txt: "مضرة", icon: "🥀" },
+              { txt: "للزينة فقط", icon: "🖼️" }
+            ],
+            correct: 1
+          },
+          {
+            q: "كيف نوفر الماء في البيت؟",
+            sound: "15.mp3",
+            opts: [
+              { txt: "نترك الحنفية مفتوحة دائماً", icon: "🚿" },
+              { txt: "نغلق الحنفية عند عدم الحاجة", icon: "🚰" },
+              { txt: "نهدر الماء في اللعب", icon: "💦" },
+              { txt: "الماء لا ينتهي أبداً", icon: "♾️" }
+            ],
+            correct: 1
+          }
+        ]
+      }
+    };
+
+    const ENCOURAGING_MSGS = [
+      "💪 قريب جداً يا بطل، حاول مرة أخرى!",
+      "🤔 فكر قليلاً، أنت ذكي!",
+      "🌈 لا تيأس، المحاولة تعلمك النجاح!",
+      "🚀 إجابة جيدة لكن ليست الصحيحة، جرب غيرها!",
+      "✨ أنت تستطيع! ركز جيداً."
+    ];
+
+    let currentTopicKey = '';
+    let currentQuestionIndex = 0;
+    let answeredCorrectly = false;
+    let childName = 'بطل';
+
+    function startGame() {
+      const nameInput = document.getElementById('childName');
+      const name = nameInput.value.trim();
+
+      if (name === '') {
+        nameInput.style.borderColor = '#FF5252';
+        return;
+      }
+
+      childName = name;
+      playSound('click');
+      document.getElementById('nameScreen').style.display = 'none';
+      document.getElementById('topicsScreen').style.display = 'block';
+    }
+
+    function startTopic(topicKey) {
+      playSound('click');
+      currentTopicKey = topicKey;
+      currentQuestionIndex = 0;
+
+      document.getElementById('topicsScreen').style.display = 'none';
+      document.getElementById('questionScreen').style.display = 'block';
+      document.getElementById('endScreen').style.display = 'none';
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const container = document.getElementById('questionContainer');
+      container.classList.remove('fade-out');
+      container.style.opacity = '1';
+      container.style.transform = 'scale(1)';
+
+      answeredCorrectly = false;
+
+      const topic = TOPICS[currentTopicKey];
+      const qObj = topic.questions[currentQuestionIndex];
+
+      const questionTextEl = document.getElementById('questionText');
+      questionTextEl.textContent = qObj.q;
+
+      const totalQuestions = topic.questions.length;
+      const progress = (currentQuestionIndex / totalQuestions) * 100;
+      const progressFill = document.getElementById('progressFill');
+      progressFill.style.width = progress + '%';
+      progressFill.classList.remove('super-charged');
+
+      if (topic.color) {
+        document.querySelector('.question-box').style.borderColor = topic.color + '33';
+        document.querySelector('.question-box').style.boxShadow = `0 10px 30px ${topic.color}33`;
+        progressFill.style.background = `linear-gradient(90deg, ${topic.color}, #69F0AE)`;
+      }
+
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+
+      let optionsWithIndex = qObj.opts.map((opt, idx) => ({
+        txt: opt.txt,
+        icon: opt.icon,
+        index: idx
+      }));
+
+      // عشوائية ترتيب الخيارات
+      for (let i = optionsWithIndex.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
+      }
+
+      optionsWithIndex.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.onclick = () => checkAnswer(opt.index, qObj.correct, btn);
+
+        btn.innerHTML = `
+          <div style="font-size: 2rem;">${opt.icon}</div>
+          <div>${opt.txt}</div>
+        `;
+        optionsGrid.appendChild(btn);
+      });
+
+      const messageBox = document.getElementById('messageBox');
+      messageBox.style.display = 'none';
+
+      // شغّل صوت السؤال المرتبط به
+      if (qObj.sound) {
+        playQuestionSound(qObj.sound);
+      }
+    }
+
+    function checkAnswer(selectedIndex, correctIndex, btnElement) {
+      if (answeredCorrectly) return;
+
+      const messageBox = document.getElementById('messageBox');
+      messageBox.style.display = 'block';
+
+      const allBtns = document.querySelectorAll('.option-btn');
+
+      if (selectedIndex === correctIndex) {
+        answeredCorrectly = true;
+        playSound('correct');
+
+        btnElement.classList.add('correct');
+        messageBox.className = 'message-box success';
+        messageBox.innerHTML = `🌟 أحسنت يا ${childName}! إجابة رائعة!`;
+
+        const totalQuestions = TOPICS[currentTopicKey].questions.length;
+        const newProgress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+        const progressFill = document.getElementById('progressFill');
+        progressFill.style.width = newProgress + '%';
+
+        if (newProgress >= 100) {
+          progressFill.classList.add('super-charged');
+        }
+
+        allBtns.forEach(b => {
+          if (b !== btnElement) {
+            b.style.opacity = '0.5';
+            b.style.pointerEvents = 'none';
+          }
+        });
+
+        createConfetti();
+
+        setTimeout(() => {
+          document.getElementById('questionContainer').classList.add('fade-out');
+          setTimeout(() => {
+            loadNextQuestion();
+          }, 400);
+        }, 1500);
+      } else {
+        playSound('wrong');
+        btnElement.classList.add('wrong');
+        messageBox.className = 'message-box try-again';
+
+        const msg = ENCOURAGING_MSGS[Math.floor(Math.random() * ENCOURAGING_MSGS.length)];
+        messageBox.textContent = msg.replace('{name}', childName);
+      }
+    }
+
+    function loadNextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < TOPICS[currentTopicKey].questions.length) {
+        loadQuestion();
+      } else {
+        showEndScreen();
+      }
+    }
+
+    function showEndScreen() {
+      playSound('win');
+      document.getElementById('questionScreen').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'block';
+      document.getElementById('endTitleText').textContent = `أحسنت يا ${childName}!`;
+      createConfetti();
+    }
+
+    function triggerButtonEffect(button, className) {
+      if (!button) return;
+      button.classList.remove(className);
+      void button.offsetWidth;
+      button.classList.add(className);
+      setTimeout(() => {
+        button.classList.remove(className);
+      }, 500);
+    }
+
+    function backToTopics() {
+      const btn = document.getElementById('newAdventureBtn');
+      triggerButtonEffect(btn, 'btn-effect-1');
+      playSound('newAdventure');
+      document.getElementById('topicsScreen').style.display = 'block';
+      document.getElementById('questionScreen').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'none';
+    }
+
+    function resetToNewPlayer() {
+      const btn = document.getElementById('newPlayerBtn');
+      triggerButtonEffect(btn, 'btn-effect-2');
+      playSound('newPlayer');
+      childName = '';
+      document.getElementById('childName').value = '';
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('topicsScreen').style.display = 'none';
+      document.getElementById('nameScreen').style.display = 'block';
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.position = 'fixed';
+        confetti.style.width = '10px';
+        confetti.style.height = '10px';
+        confetti.style.backgroundColor = ['#2962FF', '#00B0FF', '#FFD700', '#00E676'][Math.floor(Math.random() * 4)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '-10px';
+        confetti.style.zIndex = '1000';
+        confetti.style.borderRadius = '50%';
+        confetti.animate(
+          [
+            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+            { transform: `translateY(100vh) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+          ],
+          {
+            duration: 2000 + Math.random() * 2000,
+            easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+          }
+        );
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
+      }
+    }
+
+    const defaultConfig = {
+      main_title: "أبطال عُمان",
+      subtitle: "النسخة الزرقاء",
+    };
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: (config) => {
+          if (config.main_title) document.querySelector('.header h1').innerText = config.main_title;
+          if (config.subtitle) document.querySelector('.header p').innerText = config.subtitle;
+        }
+      });
+    }
+
+    document.getElementById('childName').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        startGame();
+      }
+    });
+  </script>
+</body>
+</html>
