@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أبطال عُمان - تحدي الأذكياء</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <title>أبطال عُمان - تحدي الأذكياء</title>
+
   <style>
     :root {
       --bg-gradient-start: #E3F2FD;
@@ -338,7 +340,7 @@
       height: 12px;
       background: #EFF3F8;
       border-radius: 20px;
-      margin-top: 30px;
+      margin-top: 25px;
       overflow: hidden;
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
@@ -457,7 +459,6 @@
       .content { padding: 15px; }
     }
   </style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
 <body>
   <div class="bg-shape" style="top: 10%; right: 5%;">⭐</div>
@@ -525,6 +526,16 @@
         <div id="questionContainer">
           <div class="question-box">
             <div class="question-text" id="questionText"></div>
+
+            <!-- زر إعادة تشغيل صوت السؤال -->
+            <button id="replayBtn" type="button"
+              class="btn secondary"
+              style="padding:8px 18px;font-size:0.95rem;border-radius:999px;margin-top:15px;margin-bottom:10px;display:inline-flex;align-items:center;gap:6px;"
+              onclick="replayQuestionSound()">
+              <span>🔁</span>
+              <span>إعادة تشغيل الصوت</span>
+            </button>
+
             <div class="progress-bar">
               <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -550,22 +561,33 @@
     </div>
   </div>
 
-  <script src="/_sdk/element_sdk.js"></script>
+  <!-- عناصر الصوت -->
+  <audio id="questionAudio"></audio>
+  <audio id="winAudio" src="win.mp3"></audio>
+
   <script>
-    // Web Audio API للأصوات القصيرة (ضغط، صح، خطأ، فوز...)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = AudioCtx ? new AudioCtx() : null;
     let isMuted = false;
+
+    let encouragingAudio = null;
+    let correctAudio = null;
+
+    function stopAllVoices() {
+      const qa = document.getElementById('questionAudio');
+      const wa = document.getElementById('winAudio');
+
+      try { qa.pause(); qa.currentTime = 0; } catch(e){}
+      try { wa.pause(); wa.currentTime = 0; } catch(e){}
+      try { if (encouragingAudio) { encouragingAudio.pause(); encouragingAudio.currentTime = 0; } } catch(e){}
+      try { if (correctAudio) { correctAudio.pause(); correctAudio.currentTime = 0; } } catch(e){}
+    }
 
     function toggleMute() {
       isMuted = !isMuted;
       const btn = document.getElementById('soundBtn');
       btn.textContent = isMuted ? '🔇' : '🔊';
-
-      // إذا تم كتم الصوت، أوقف صوت السؤال أيضاً
-      try {
-        questionVoice.pause();
-      } catch (e) {}
+      stopAllVoices();
     }
 
     function playSound(type) {
@@ -587,72 +609,121 @@
         gain.gain.linearRampToValueAtTime(0, now + 0.1);
         osc.start(now);
         osc.stop(now + 0.1);
+      } else if (type === 'victory') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
       } else if (type === 'correct') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440, now);
         osc.frequency.setValueAtTime(554.37, now + 0.1);
         osc.frequency.setValueAtTime(659.25, now + 0.2);
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
         osc.start(now);
         osc.stop(now + 0.5);
       } else if (type === 'wrong') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.linearRampToValueAtTime(150, now + 0.2);
-        gain.gain.setValueAtTime(0.1, now);
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+        gain.gain.setValueAtTime(0.12, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
         osc.start(now);
         osc.stop(now + 0.3);
-      } else if (type === 'win') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(523.25, now);
-        osc.frequency.setValueAtTime(659.25, now + 0.15);
-        osc.frequency.setValueAtTime(783.99, now + 0.30);
-        osc.frequency.setValueAtTime(987.77, now + 0.45);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.18, now + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
-        osc.start(now);
-        osc.stop(now + 0.9);
-      } else if (type === 'newAdventure') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(392.00, now);
-        osc.frequency.setValueAtTime(523.25, now + 0.08);
-        osc.frequency.setValueAtTime(659.25, now + 0.16);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-        osc.start(now);
-        osc.stop(now + 0.5);
-      } else if (type === 'newPlayer') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(659.25, now);
-        osc.frequency.setValueAtTime(440.00, now + 0.15);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        osc.start(now);
-        osc.stop(now + 0.6);
       }
     }
 
-    // مشغّل صوت واحد لأسئلة الMp3
-    let questionVoice = new Audio();
+    let lastQuestionSoundFile = "";
 
     function playQuestionSound(fileName) {
+      if (isMuted || !fileName) return;
+      stopAllVoices();
+      lastQuestionSoundFile = fileName;
+      const audioEl = document.getElementById("questionAudio");
+      try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) {}
+      audioEl.src = fileName;
+      audioEl.play().catch(() => {});
+    }
+
+    function replayQuestionSound() {
+      if (!lastQuestionSoundFile) return;
+      playQuestionSound(lastQuestionSoundFile);
+    }
+
+    const ENCOURAGING_SOUNDS_FILES = [
+      "sounds/wrong1.mp3",
+      "sounds/wrong2.mp3",
+      "sounds/wrong3.mp3"
+    ];
+    let lastEncSoundIndex = -1;
+
+    function playEncouragingVoice() {
+      if (isMuted || ENCOURAGING_SOUNDS_FILES.length === 0) return;
+      stopAllVoices();
+      let idx = Math.floor(Math.random() * ENCOURAGING_SOUNDS_FILES.length);
+      if (ENCOURAGING_SOUNDS_FILES.length > 1 && idx === lastEncSoundIndex) {
+        idx = (idx + 1) % ENCOURAGING_SOUNDS_FILES.length;
+      }
+      lastEncSoundIndex = idx;
+      try {
+        if (encouragingAudio) {
+          encouragingAudio.pause();
+          encouragingAudio.currentTime = 0;
+        }
+      } catch(e){}
+      encouragingAudio = new Audio(ENCOURAGING_SOUNDS_FILES[idx]);
+      encouragingAudio.play().catch(() => {});
+    }
+
+    const CORRECT_SOUNDS_FILES_NORMAL = [
+      "sounds/correct1.mp3",
+      "sounds/correct2.mp3"
+    ];
+    const CORRECT_LAST_SOUND = "sounds/correct3.mp3";
+    let lastCorrectIndex = -1;
+
+    function playCorrectVoice(isLastQuestion) {
       if (isMuted) return;
+      stopAllVoices();
+
+      let file;
+      if (isLastQuestion) {
+        file = CORRECT_LAST_SOUND;
+      } else {
+        if (CORRECT_SOUNDS_FILES_NORMAL.length === 0) return;
+        let idx = Math.floor(Math.random() * CORRECT_SOUNDS_FILES_NORMAL.length);
+        if (CORRECT_SOUNDS_FILES_NORMAL.length > 1 && idx === lastCorrectIndex) {
+          idx = (idx + 1) % CORRECT_SOUNDS_FILES_NORMAL.length;
+        }
+        lastCorrectIndex = idx;
+        file = CORRECT_SOUNDS_FILES_NORMAL[idx];
+      }
 
       try {
-        questionVoice.pause();
-        questionVoice.currentTime = 0;
-      } catch (e) {}
+        if (correctAudio) {
+          correctAudio.pause();
+          correctAudio.currentTime = 0;
+        }
+      } catch(e){}
 
-      questionVoice = new Audio(fileName);
-      questionVoice.play().catch(() => {
-        // المتصفح ممكن يمنع التشغيل التلقائي، نتجاهل الخطأ
-      });
+      correctAudio = new Audio(file);
+      correctAudio.play().catch(() => {});
+    }
+
+    function playWinSound() {
+      if (isMuted) return;
+      stopAllVoices();
+      const winEl = document.getElementById("winAudio");
+      try { winEl.pause(); winEl.currentTime = 0; } catch (e) {}
+      winEl.play().catch(() => {});
+      playSound('victory');
     }
 
     const TOPICS = { 
@@ -758,7 +829,7 @@
             correct: 1
           },
           {
-            q: "كم ساعة يجب أن تلعب وتتحرك يومياً؟",
+            q: "كم ساعة يجب أن تتحرك يومياً؟",
             sound: "9.mp3",
             opts: [
               { txt: "لا حاجة للحركة", icon: "🛋️" },
@@ -864,12 +935,10 @@
     function startGame() {
       const nameInput = document.getElementById('childName');
       const name = nameInput.value.trim();
-
       if (name === '') {
         nameInput.style.borderColor = '#FF5252';
         return;
       }
-
       childName = name;
       playSound('click');
       document.getElementById('nameScreen').style.display = 'none';
@@ -880,11 +949,9 @@
       playSound('click');
       currentTopicKey = topicKey;
       currentQuestionIndex = 0;
-
       document.getElementById('topicsScreen').style.display = 'none';
       document.getElementById('questionScreen').style.display = 'block';
       document.getElementById('endScreen').style.display = 'none';
-
       loadQuestion();
     }
 
@@ -923,7 +990,6 @@
         index: idx
       }));
 
-      // عشوائية ترتيب الخيارات
       for (let i = optionsWithIndex.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
@@ -933,7 +999,6 @@
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.onclick = () => checkAnswer(opt.index, qObj.correct, btn);
-
         btn.innerHTML = `
           <div style="font-size: 2rem;">${opt.icon}</div>
           <div>${opt.txt}</div>
@@ -944,7 +1009,6 @@
       const messageBox = document.getElementById('messageBox');
       messageBox.style.display = 'none';
 
-      // شغّل صوت السؤال المرتبط به
       if (qObj.sound) {
         playQuestionSound(qObj.sound);
       }
@@ -955,22 +1019,24 @@
 
       const messageBox = document.getElementById('messageBox');
       messageBox.style.display = 'block';
-
       const allBtns = document.querySelectorAll('.option-btn');
+      const topic = TOPICS[currentTopicKey];
+      const isLastQuestion = currentQuestionIndex === topic.questions.length - 1;
 
       if (selectedIndex === correctIndex) {
         answeredCorrectly = true;
+
+        playCorrectVoice(isLastQuestion);
         playSound('correct');
 
         btnElement.classList.add('correct');
         messageBox.className = 'message-box success';
         messageBox.innerHTML = `🌟 أحسنت يا ${childName}! إجابة رائعة!`;
 
-        const totalQuestions = TOPICS[currentTopicKey].questions.length;
+        const totalQuestions = topic.questions.length;
         const newProgress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
         const progressFill = document.getElementById('progressFill');
         progressFill.style.width = newProgress + '%';
-
         if (newProgress >= 100) {
           progressFill.classList.add('super-charged');
         }
@@ -991,7 +1057,9 @@
           }, 400);
         }, 1500);
       } else {
+        playEncouragingVoice();
         playSound('wrong');
+
         btnElement.classList.add('wrong');
         messageBox.className = 'message-box try-again';
 
@@ -1010,7 +1078,7 @@
     }
 
     function showEndScreen() {
-      playSound('win');
+      playWinSound();
       document.getElementById('questionScreen').style.display = 'none';
       document.getElementById('endScreen').style.display = 'block';
       document.getElementById('endTitleText').textContent = `أحسنت يا ${childName}!`;
@@ -1030,7 +1098,7 @@
     function backToTopics() {
       const btn = document.getElementById('newAdventureBtn');
       triggerButtonEffect(btn, 'btn-effect-1');
-      playSound('newAdventure');
+      playSound('click');
       document.getElementById('topicsScreen').style.display = 'block';
       document.getElementById('questionScreen').style.display = 'none';
       document.getElementById('endScreen').style.display = 'none';
@@ -1039,7 +1107,7 @@
     function resetToNewPlayer() {
       const btn = document.getElementById('newPlayerBtn');
       triggerButtonEffect(btn, 'btn-effect-2');
-      playSound('newPlayer');
+      playSound('click');
       childName = '';
       document.getElementById('childName').value = '';
       document.getElementById('endScreen').style.display = 'none';
@@ -1071,21 +1139,6 @@
         document.body.appendChild(confetti);
         setTimeout(() => confetti.remove(), 4000);
       }
-    }
-
-    const defaultConfig = {
-      main_title: "أبطال عُمان",
-      subtitle: "النسخة الزرقاء",
-    };
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig: defaultConfig,
-        onConfigChange: (config) => {
-          if (config.main_title) document.querySelector('.header h1').innerText = config.main_title;
-          if (config.subtitle) document.querySelector('.header p').innerText = config.subtitle;
-        }
-      });
     }
 
     document.getElementById('childName').addEventListener('keydown', (e) => {
