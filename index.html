@@ -1146,6 +1146,71 @@
         startGame();
       }
     });
+	 // دوال الدخول والخروج من الفل سكرين
+  function enterFullscreen() {
+    const el = document.documentElement; // أو غيّره لأي عنصر تريده
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) { // Safari
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) { // قديم
+      el.msRequestFullscreen();
+    }
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+
+  function isFullscreen() {
+    return document.fullscreenElement ||
+           document.webkitFullscreenElement ||
+           document.msFullscreenElement;
+  }
+
+  // عدّاد الكلكات
+  let clickCount = 0;
+  let firstClickTime = 0;
+  const CLICK_WINDOW = 800; // ms (الفترة القصوى بين أول وآخر كلك)
+
+  // غيّر target لو حاب يكون على عنصر معين بدال كل الصفحة
+  const target = document.documentElement; // أو document.getElementById('questionScreen') مثلاً
+
+  target.addEventListener('click', () => {
+    const now = Date.now();
+
+    // لو تعدّت المدة، نبدأ عد جديد
+    if (now - firstClickTime > CLICK_WINDOW) {
+      clickCount = 0;
+      firstClickTime = now;
+    }
+
+    clickCount++;
+
+    // لو أول كلك
+    if (clickCount === 1) {
+      firstClickTime = now;
+    }
+
+    // ٢ كلك → دخول فل سكرين (لو ما داخل فل سكرين)
+    if (!isFullscreen() && clickCount === 2) {
+      enterFullscreen();
+      // ما نرجع الصفر عشان نقدر نكمل لحد ٤ كلك إذا حاب يخرج بسرعة
+    }
+
+    // ٤ كلك → خروج من فل سكرين (لو داخل فل سكرين)
+    if (isFullscreen() && clickCount === 4) {
+      exitFullscreen();
+      clickCount = 0;
+      firstClickTime = 0;
+    }
+  });
   </script>
 </body>
 </html>
