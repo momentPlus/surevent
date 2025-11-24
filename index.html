@@ -466,7 +466,10 @@
   <div class="bg-shape" style="top: 40%; left: 50%; font-size: 80px; animation-delay: -10s;">✨</div>
 
   <div class="container glass-bg-mobile">
-    <div class="sound-toggle" onclick="toggleMute()" id="soundBtn">🔊</div>
+    <!-- زر المؤثرات الصوتية (SFX) -->
+    <div class="sound-toggle" onclick="toggleSfx()" id="sfxBtn" style="left:25px; top:25px;">🔔</div>
+    <!-- زر موسيقى اللوبي 🎵 / 🔇 -->
+    <div class="sound-toggle" onclick="toggleMusic()" id="musicBtn" style="left:80px; top:25px;">🎵</div>
 
     <div class="header">
       <h1 class="animate-text-gradient">أبطال عُمان</h1>
@@ -488,9 +491,17 @@
 
       <!-- الشاشة 2: المواضيع -->
       <div id="topicsScreen" style="display: none;">
-        <h3 class="animate-text-gradient" style="text-align: center; margin-bottom: 30px; font-size: 2rem;">
-          اختر ميدان التحدي
-        </h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:10px;flex-wrap:wrap;">
+          <h3 class="animate-text-gradient" style="text-align: center; font-size: 2rem; margin:0;">
+            اختر ميدان التحدي
+          </h3>
+          <button class="btn secondary"
+                  style="padding:8px 20px;font-size:1rem;border-radius:50px;"
+                  onclick="resetToNewPlayer()">
+            شخص جديد 👤
+          </button>
+        </div>
+
         <div class="topics-grid">
           <button class="topic-btn" onclick="startTopic('education')">
             <div class="topic-icon">📚</div>
@@ -564,15 +575,49 @@
   <!-- عناصر الصوت -->
   <audio id="questionAudio"></audio>
   <audio id="winAudio" src="win.mp3"></audio>
+  <!-- موسيقى اللوبي -->
+  <audio id="bgMusic" src="sounds/main.mp3" loop></audio>
 
   <script>
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = AudioCtx ? new AudioCtx() : null;
+
+    // isMuted = كتم المؤثرات الصوتية فقط (SFX)
     let isMuted = false;
+    // كتم موسيقى اللوبي
+    let isMusicMuted = false;
+
+    const bgMusic = document.getElementById("bgMusic");
+    if (bgMusic) {
+      bgMusic.volume = 0.35; // موسيقى خفيفة
+    }
+
+    function startLobbyMusic() {
+      if (isMusicMuted || !bgMusic) return;
+      bgMusic.volume = 0.35;
+      if (bgMusic.paused) {
+        bgMusic.play().catch(() => {});
+      }
+    }
+
+    window.addEventListener('load', () => {
+  const unlockMusic = () => {
+    if (!isMusicMuted) {
+      startLobbyMusic();
+    }
+    // نزيل اللستينرز بعد أول تفاعل
+    document.removeEventListener('click', unlockMusic);
+    document.removeEventListener('keydown', unlockMusic);
+  };
+
+  document.addEventListener('click', unlockMusic);
+  document.addEventListener('keydown', unlockMusic);
+});
 
     let encouragingAudio = null;
     let correctAudio = null;
 
+    // إيقاف كل الأصوات (ما عدا موسيقى الخلفية)
     function stopAllVoices() {
       const qa = document.getElementById('questionAudio');
       const wa = document.getElementById('winAudio');
@@ -583,11 +628,30 @@
       try { if (correctAudio) { correctAudio.pause(); correctAudio.currentTime = 0; } } catch(e){}
     }
 
-    function toggleMute() {
+    function stopBgMusic() {
+      if (!bgMusic) return;
+      try { bgMusic.pause(); } catch(e){}
+    }
+
+    function toggleSfx() {
       isMuted = !isMuted;
-      const btn = document.getElementById('soundBtn');
-      btn.textContent = isMuted ? '🔇' : '🔊';
-      stopAllVoices();
+      const btn = document.getElementById('sfxBtn');
+      btn.textContent = isMuted ? '🔕' : '🔔';
+      if (isMuted) {
+        stopAllVoices();
+      }
+    }
+
+    function toggleMusic() {
+      isMusicMuted = !isMusicMuted;
+      const btn = document.getElementById('musicBtn');
+      btn.textContent = isMusicMuted ? '🔇' : '🎵';
+
+      if (isMusicMuted) {
+        stopBgMusic();
+      } else {
+        startLobbyMusic();
+      }
     }
 
     function playSound(type) {
@@ -941,6 +1005,14 @@
       }
       childName = name;
       playSound('click');
+
+      // إيقاف موسيقى اللوبي وإخفاء زر الموسيقى فقط
+      stopBgMusic();
+      const musicBtn = document.getElementById('musicBtn');
+      if (musicBtn) {
+        musicBtn.style.display = 'none';
+      }
+
       document.getElementById('nameScreen').style.display = 'none';
       document.getElementById('topicsScreen').style.display = 'block';
     }
@@ -1113,6 +1185,22 @@
       document.getElementById('endScreen').style.display = 'none';
       document.getElementById('topicsScreen').style.display = 'none';
       document.getElementById('nameScreen').style.display = 'block';
+
+      // إظهار زر الموسيقى من جديد
+      const musicBtn = document.getElementById('musicBtn');
+      if (musicBtn) {
+        musicBtn.style.display = 'flex';
+        musicBtn.textContent = isMusicMuted ? '🔇' : '🎵';
+      }
+
+      // إرجاع موسيقى اللوبي حسب حالة زر الموسيقى
+      if (!isMusicMuted && bgMusic) {
+        bgMusic.volume = 0.25;
+        bgMusic.currentTime = 0;
+        bgMusic.play().catch(() => {});
+      } else {
+        stopBgMusic();
+      }
     }
 
     function createConfetti() {
@@ -1146,71 +1234,65 @@
         startGame();
       }
     });
-	 // دوال الدخول والخروج من الفل سكرين
-  function enterFullscreen() {
-    const el = document.documentElement; // أو غيّره لأي عنصر تريده
-    if (el.requestFullscreen) {
-      el.requestFullscreen();
-    } else if (el.webkitRequestFullscreen) { // Safari
-      el.webkitRequestFullscreen();
-    } else if (el.msRequestFullscreen) { // قديم
-      el.msRequestFullscreen();
-    }
-  }
 
-  function exitFullscreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-
-  function isFullscreen() {
-    return document.fullscreenElement ||
-           document.webkitFullscreenElement ||
-           document.msFullscreenElement;
-  }
-
-  // عدّاد الكلكات
-  let clickCount = 0;
-  let firstClickTime = 0;
-  const CLICK_WINDOW = 800; // ms (الفترة القصوى بين أول وآخر كلك)
-
-  // غيّر target لو حاب يكون على عنصر معين بدال كل الصفحة
-  const target = document.documentElement; // أو document.getElementById('questionScreen') مثلاً
-
-  target.addEventListener('click', () => {
-    const now = Date.now();
-
-    // لو تعدّت المدة، نبدأ عد جديد
-    if (now - firstClickTime > CLICK_WINDOW) {
-      clickCount = 0;
-      firstClickTime = now;
+    // دوال الفل سكرين (نفس ما طلبت سابقاً)
+    function enterFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      } else if (el.msRequestFullscreen) {
+        el.msRequestFullscreen();
+      }
     }
 
-    clickCount++;
-
-    // لو أول كلك
-    if (clickCount === 1) {
-      firstClickTime = now;
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
     }
 
-    // ٢ كلك → دخول فل سكرين (لو ما داخل فل سكرين)
-    if (!isFullscreen() && clickCount === 2) {
-      enterFullscreen();
-      // ما نرجع الصفر عشان نقدر نكمل لحد ٤ كلك إذا حاب يخرج بسرعة
+    function isFullscreen() {
+      return document.fullscreenElement ||
+             document.webkitFullscreenElement ||
+             document.msFullscreenElement;
     }
 
-    // ٤ كلك → خروج من فل سكرين (لو داخل فل سكرين)
-    if (isFullscreen() && clickCount === 4) {
-      exitFullscreen();
-      clickCount = 0;
-      firstClickTime = 0;
-    }
-  });
+    let clickCount = 0;
+    let firstClickTime = 0;
+    const CLICK_WINDOW = 800;
+
+    const target = document.documentElement;
+
+    target.addEventListener('click', () => {
+      const now = Date.now();
+
+      if (now - firstClickTime > CLICK_WINDOW) {
+        clickCount = 0;
+        firstClickTime = now;
+      }
+
+      clickCount++;
+
+      if (clickCount === 1) {
+        firstClickTime = now;
+      }
+
+      if (!isFullscreen() && clickCount === 2) {
+        enterFullscreen();
+      }
+
+      if (isFullscreen() && clickCount === 4) {
+        exitFullscreen();
+        clickCount = 0;
+        firstClickTime = 0;
+      }
+    });
   </script>
 </body>
 </html>
