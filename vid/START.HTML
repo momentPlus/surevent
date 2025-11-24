@@ -105,8 +105,14 @@
             pointer-events: none;
             z-index: 50;
         }
+
+        /* زر تشغيل يدوي احتياطي */
+        #fallbackPlayBtn {
+            display: none;
+        }
     </style>
 </head>
+<!-- تم تحديث اسم ملف الخلفية هنا -->
 <body class="bg-gray-900 text-white h-screen w-screen bg-cover bg-center" style="background-image: url('Gemini_Generated_Image_2l76wl2l76wl2l76.png');">
 
     <canvas id="confettiCanvas"></canvas>
@@ -130,7 +136,7 @@
 
                 <button id="launchBtn" class="launch-btn text-blue-900">
                     <span class="text-xl font-bold">اضغط مطولاً</span>
-                    <span class="text-sm font-light mt-1">للتدشين</span>
+                    <span class="text-sm font-light mt-1"></span>
                 </button>
             </div>
             
@@ -141,8 +147,16 @@
     <!-- الصفحة الثانية: الفيديو -->
     <div id="videoPage" class="page hidden-page flex items-center justify-center bg-black">
         <video id="mainVideo" class="max-w-full max-h-full shadow-2xl" playsinline>
-            <source src="النسخة النهائية.mp4" type="video/mp4">
+            <!-- تمت العودة للملف المرفوع لضمان التشغيل -->
+            <source src="https://pouch.jumpshare.com/preview/ReYCRxghFzuadzJOMmI3DzfhKRrVr5MRFZf47c3JvyoLlZQkx1QSuLLEt0yMjqiW_EjBd-TW44ZXhz26xhB8wra50PYua8wnJ7kMgC8MgFZPU9x2BFnDibPRYTyrBTIShPXL3LEbzOyti8ohgWkBLG6yjbN-I2pg_cnoHs_AmgI.mp4" type="video/mp4">
+            متصفحك لا يدعم الفيديو.
         </video>
+        
+        <!-- زر تشغيل يدوي يظهر فقط في حال فشل التشغيل التلقائي -->
+        <button id="fallbackPlayBtn" onclick="forcePlay()" class="absolute z-50 bg-white text-black rounded-full p-4 shadow-lg">
+            ▶ تشغيل الفيديو
+        </button>
+
         <button onclick="resetApp()" class="absolute top-4 left-4 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 px-4 backdrop-blur-sm transition z-50">
             خروج ✕
         </button>
@@ -167,10 +181,11 @@
         const landingPage = document.getElementById('landingPage');
         const videoPage = document.getElementById('videoPage');
         const mainVideo = document.getElementById('mainVideo');
+        const fallbackBtn = document.getElementById('fallbackPlayBtn');
         
         let isHolding = false;
         let holdStartTime = 0;
-        let holdDuration = 1500; // 2.5 ثانية للتدشين
+        let holdDuration = 0500; // 2.5 ثانية للتدشين
         let animationFrame;
         let audioCtx;
         let osc;
@@ -188,9 +203,9 @@
             osc = audioCtx.createOscillator();
             gainNode = audioCtx.createGain();
             
-            osc.type = 'sawtooth'; // صوت أكثر حدة
+            osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + (holdDuration/1000)); // تصاعد النغمة
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + (holdDuration/1000));
             
             gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + (holdDuration/1000));
@@ -202,9 +217,11 @@
 
         function stopChargingSound() {
             if (osc) {
-                const stopTime = audioCtx.currentTime + 0.1;
-                gainNode.gain.exponentialRampToValueAtTime(0.001, stopTime);
-                osc.stop(stopTime);
+                try {
+                    const stopTime = audioCtx.currentTime + 0.1;
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, stopTime);
+                    osc.stop(stopTime);
+                } catch(e) {}
                 osc = null;
             }
         }
@@ -229,8 +246,11 @@
 
         // --- منطق الضغط ---
         function startHold(e) {
-            e.preventDefault(); // منع قائمة السياق على الموبايل
+            e.preventDefault(); 
             if (isHolding) return;
+            
+            // تهيئة الفيديو مسبقاً (خدعة للجوال)
+            mainVideo.load();
             
             isHolding = true;
             holdStartTime = Date.now();
@@ -246,7 +266,6 @@
             btn.classList.remove('shaking');
             stopChargingSound();
             
-            // إعادة تعيين التقدم ببطء أو بسرعة
             circle.style.transition = 'stroke-dashoffset 0.3s ease-out';
             circle.style.strokeDashoffset = circumference;
         }
@@ -257,7 +276,7 @@
             const elapsed = Date.now() - holdStartTime;
             const progress = Math.min((elapsed / holdDuration) * 100, 100);
             
-            circle.style.transition = 'none'; // إزالة الانتقال لتحديث فوري
+            circle.style.transition = 'none'; 
             setProgress(progress);
 
             if (progress >= 100) {
@@ -274,12 +293,10 @@
             
             btn.classList.remove('shaking');
             btn.classList.add('glow-effect');
-            btn.innerHTML = '<span class="text-3xl">أنطلق</span>'; // تغيير الأيقونة
+            btn.innerHTML = '<span class="text-3xl">أنطلق</span>';
             
-            // إطلاق الألعاب النارية
             fireConfetti();
             
-            // الانتقال للفيديو
             setTimeout(() => {
                 landingPage.classList.remove('active-page');
                 landingPage.classList.add('hidden-page');
@@ -287,25 +304,37 @@
                 videoPage.classList.add('active-page');
                 
                 mainVideo.currentTime = 0;
-                mainVideo.play();
                 
-                // إعادة تعيين الزر للمرة القادمة
+                // محاولة التشغيل
+                const playPromise = mainVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Auto-play was prevented. Showing fallback button.");
+                        fallbackBtn.style.display = 'block'; // إظهار زر التشغيل اليدوي
+                    });
+                }
+                
                 setTimeout(() => {
                     btn.classList.remove('glow-effect');
                     btn.innerHTML = '<span class="text-xl font-bold">اضغط مطولاً</span><span class="text-sm font-light mt-1">للتدشين</span>';
                     setProgress(0);
                 }, 1000);
-            }, 1200); // انتظر قليلاً لرؤية الاحتفال
+            }, 1200);
         }
 
-        // --- مستمعات الأحداث (ماوس + لمس) ---
+        function forcePlay() {
+            mainVideo.play();
+            fallbackBtn.style.display = 'none';
+        }
+
+        // --- مستمعات الأحداث ---
         btn.addEventListener('mousedown', startHold);
         btn.addEventListener('touchstart', startHold);
 
         window.addEventListener('mouseup', endHold);
         window.addEventListener('touchend', endHold);
         
-        // --- نظام الألعاب النارية (Canvas Confetti بسيط) ---
+        // --- Confetti ---
         function fireConfetti() {
             const canvas = document.getElementById('confettiCanvas');
             const ctx = canvas.getContext('2d');
@@ -337,7 +366,7 @@
                         activeParticles = true;
                         p.x += p.vx;
                         p.y += p.vy;
-                        p.vy += 0.2; // Gravity
+                        p.vy += 0.2; 
                         p.life -= 1;
                         
                         ctx.fillStyle = p.color;
@@ -357,7 +386,6 @@
             updateConfetti();
         }
 
-        // وظائف الفيديو
         function resetApp() {
             mainVideo.pause();
             videoPage.classList.remove('active-page');
@@ -365,10 +393,11 @@
             landingPage.classList.remove('hidden-page');
             landingPage.classList.add('active-page');
             setProgress(0);
+            fallbackBtn.style.display = 'none';
         }
 
         mainVideo.addEventListener('ended', resetApp);
-		 // دوال الدخول والخروج من الفل سكرين
+		  // دوال الدخول والخروج من الفل سكرين
   function enterFullscreen() {
     const el = document.documentElement; // أو غيّره لأي عنصر تريده
     if (el.requestFullscreen) {
