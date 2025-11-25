@@ -7,6 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+
+#mainVideo {
+    width: auto !important;        /* إزالة التحكم العرضي من Tailwind */
+    height: 100vh !important;      /* يملأ طول الشاشة */
+    max-height: 100vh !important;
+    object-fit: cover !important;  /* يملأ بدون تشويه */
+    object-position: center !important;
+    background: black !important;  /* لو كان هناك فراغات */
+}
+
         body {
             font-family: 'Cairo', sans-serif;
             overflow: hidden;
@@ -465,5 +475,6 @@
     </script>
 </body>
 </html>
+
 
 
